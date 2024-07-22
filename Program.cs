@@ -43,19 +43,23 @@ public partial class Zippy
     const uint MOD_CONTROL = 0x0002;
     const uint MOD_SHIFT = 0x0004;
     const uint WM_HOTKEY = 0x0312;
+    static INIFile? iniFile;
 
     static void loadINIFile(string file)
     {
         if (!File.Exists(file))
         {
-            Console.WriteLine("INI file not found, defualt shortcuts will be used.");
+            Console.WriteLine("INI file not found, defualt shortcuts will be used.\n");
             Console.WriteLine("Save: CTRL + SHIFT + S");
             Console.WriteLine("Restore: CTRL + SHIFT + Z");
             Console.WriteLine("Quit: CTRL + SHIFT + Q");
             return;
         }
-        INIFile iniFile = new INIFile(file);
+        iniFile = new INIFile(file);
         string save = iniFile.Read("Shortcuts", "Save");
+        string restore = iniFile.Read("Shortcut", "Restore");
+        string quit = iniFile.Read("Shortcut", "Quit");
+
     }
 
     public static void Main()
@@ -130,6 +134,10 @@ public partial class Zippy
             }
         }
 
+        // static void Modifiers()
+        // {
+        // }
+
         uint atom = GlobalAddAtomA("ZipperHotKey");
         uint atomRestore = GlobalAddAtomA("ZipperHotKeyRestore");
         uint atomQuit = GlobalAddAtomA("ZipperHotKeyQuit");
@@ -185,10 +193,32 @@ class INIFile
     int size,
     string filePath);
 
+    [DllImport("kernel32")]
+    private static extern int GetPrivateProfileString(int Section,
+    string Key,
+    string Value,
+    [MarshalAs(UnmanagedType.LPArray)] byte[] Result,
+    int Size, string FileName);
+
     public INIFile(string filePath)
     {
         this.filePath = filePath;
     }
+
+    // public void GetAllPair(INIFile iniFile)
+    // {
+    //     IniFile ini = new IniFile();
+    //     ini.Load("path to your .ini file ...");
+    //     foreach (IniSection section in ini.Sections)
+    //     {
+    //         foreach (IniKey key in section.Keys)
+    //         {
+    //             string sectionName = section.Name;
+    //             string keyName = key.Name;
+    //             string keyValue = key.Value;
+    //         }
+    //     }
+    // }
 
     public void Write(string section, string key, string value)
     {
