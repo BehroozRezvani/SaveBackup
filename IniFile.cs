@@ -37,6 +37,24 @@ namespace FolderSaver
             this.filePath = filePath;
         }
 
+        private List<bool> SaveHotkey()
+        {
+            List<bool> hotKeys = [false, false, false];
+            if(Read("Save", "CTRL").Equals("true", StringComparison.OrdinalIgnoreCase))
+            {
+                hotKeys[0] = true;
+            }
+            if(Read("Save", "ALT").Equals("true", StringComparison.OrdinalIgnoreCase))
+            {
+                hotKeys[1] = true;
+            }
+            if(Read("Save", "SHIFT").Equals("true", StringComparison.OrdinalIgnoreCase))
+            {
+                hotKeys[2] = true;
+            }
+            return hotKeys;
+        }
+
         // public void GetAllPair(INIFile iniFile)
         // {
         //     IniFile ini = new IniFile();
