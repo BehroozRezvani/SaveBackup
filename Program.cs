@@ -41,13 +41,41 @@ namespace FolderSaver
             readonly int lPrivate;
         }
 
+        const uint MOD_ALT = 0x0001;
         const uint MOD_CONTROL = 0x0002;
         const uint MOD_SHIFT = 0x0004;
         const uint WM_HOTKEY = 0x0312;
-        
+
         public static void Main()
         {
+            uint modifier = 0;
             Console.WriteLine(System.AppContext.BaseDirectory);
+            string iniFilePath = Path.Combine(System.AppContext.BaseDirectory, "config.ini");
+            if (File.Exists(iniFilePath))
+            {
+                IniFile iniFile = new(iniFilePath);
+                if (iniFile.HasALT())
+                {
+                    modifier |= MOD_ALT;
+                }
+                if (iniFile.HasCTRL())
+                {
+                    modifier |= MOD_CONTROL;
+                }
+                if (iniFile.HasSHIFT())
+                {
+                    modifier |= MOD_SHIFT;
+                }
+
+            }
+            else 
+            {
+                Console.WriteLine("INI file not found, defualt shortcuts will be used.\n");
+                Console.WriteLine("Save: CTRL + SHIFT + S");
+                Console.WriteLine("Restore: CTRL + SHIFT + Z");
+                Console.WriteLine("Quit: CTRL + SHIFT + Q");
+            }
+
             static void ZipFolder()
             {
                 try
@@ -117,13 +145,11 @@ namespace FolderSaver
                 }
             }
 
-            // static void Modifiers()
-            // {
-            // }
-
             uint atom = GlobalAddAtomA("ZipperHotKey");
             uint atomRestore = GlobalAddAtomA("ZipperHotKeyRestore");
             uint atomQuit = GlobalAddAtomA("ZipperHotKeyQuit");
+
+            RegisterHotKey(0, atom, modifier, Keys.S);
 
             bool Save = RegisterHotKey(0, atom, MOD_CONTROL | MOD_SHIFT, Keys.S);
             bool Restore = RegisterHotKey(0, atomRestore, MOD_CONTROL | MOD_SHIFT, Keys.Z);
@@ -155,22 +181,6 @@ namespace FolderSaver
             GlobalDeleteAtom(atom);
             GlobalDeleteAtom(atomRestore);
             GlobalDeleteAtom(atomQuit);
-        }
-        static IniFile? iniFile;
-        static void loadINIFile(string file)
-        {
-            if (!File.Exists(file))
-            {
-                Console.WriteLine("INI file not found, defualt shortcuts will be used.\n");
-                Console.WriteLine("Save: CTRL + SHIFT + S");
-                Console.WriteLine("Restore: CTRL + SHIFT + Z");
-                Console.WriteLine("Quit: CTRL + SHIFT + Q");
-                return;
-            }
-            iniFile = new IniFile(file);
-            string save = iniFile.Read("Shortcuts", "Save");
-            string restore = iniFile.Read("Shortcut", "Restore");
-            string quit = iniFile.Read("Shortcut", "Quit");
-        }
+        }        
     }
 }

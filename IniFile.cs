@@ -7,13 +7,9 @@ using System.Threading.Tasks;
 
 namespace FolderSaver
 {
-    internal class IniFile
+    public class IniFile(string filePath)
     {
-        [DllImport("kernel32")]
-        private static extern long WritePrivateProfileString(string section,
-        string key,
-        string val,
-        string filePath);
+        private string FilePath { get; } = filePath;
 
         [DllImport("kernel32")]
         private static extern int GetPrivateProfileString(string section,
@@ -23,70 +19,53 @@ namespace FolderSaver
         int size,
         string filePath);
 
-        [DllImport("kernel32")]
-        private static extern int GetPrivateProfileString(int Section,
-        string Key,
-        string Value,
-        [MarshalAs(UnmanagedType.LPArray)] byte[] Result,
-        int Size, string FileName);
+        //[DllImport("kernel32")]
+        //private static extern long WritePrivateProfileString(string section,
+        //string key,
+        //string val,
+        //string filePath);
 
+        //[DllImport("kernel32")]
+        //private static extern int GetPrivateProfileString(int Section,
+        //string Key,
+        //string Value,
+        //[MarshalAs(UnmanagedType.LPArray)] byte[] Result,
+        //int Size, string FileName);
 
-        private string filePath;
-        public IniFile(string filePath)
+        public bool HasCTRL()
         {
-            this.filePath = filePath;
+            if (Read("Save", "CTRL").Equals("true", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+            return false;
+        }
+        public bool HasALT() {
+            if (Read("Save", "ALT").Equals("true", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+            return false;
+        }
+        public bool HasSHIFT()
+        {
+            if (Read("Save", "SHIFT").Equals("true", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+            return false;
         }
 
-        private List<bool> SaveHotkey()
+        public string GetModifierKey()
         {
-            List<bool> hotKeys = [false, false, false];
-            if(Read("Save", "CTRL").Equals("true", StringComparison.OrdinalIgnoreCase))
-            {
-                hotKeys[0] = true;
-            }
-            if(Read("Save", "ALT").Equals("true", StringComparison.OrdinalIgnoreCase))
-            {
-                hotKeys[1] = true;
-            }
-            if(Read("Save", "SHIFT").Equals("true", StringComparison.OrdinalIgnoreCase))
-            {
-                hotKeys[2] = true;
-            }
-            return hotKeys;
+            return Read("Save", "MODIFIER");
         }
 
-        // public void GetAllPair(INIFile iniFile)
-        // {
-        //     IniFile ini = new IniFile();
-        //     ini.Load("path to your .ini file ...");
-        //     foreach (IniSection section in ini.Sections)
-        //     {
-        //         foreach (IniKey key in section.Keys)
-        //         {
-        //             string sectionName = section.Name;
-        //             string keyName = key.Name;
-        //             string keyValue = key.Value;
-        //         }
-        //     }
-        // }
-
-        public void Write(string section, string key, string value)
+        private string Read(string section, string key)
         {
-            WritePrivateProfileString(section, key, value.ToLower(), this.filePath);
-        }
-
-        public string Read(string section, string key)
-        {
-            StringBuilder SB = new StringBuilder(255);
-            int i = GetPrivateProfileString(section, key, "", SB, 255, this.filePath);
+            StringBuilder SB = new(255) {};
+            int i = GetPrivateProfileString(section, key, "", SB, 255, this.FilePath);
             return SB.ToString();
         }
-
-        public string FilePath
-        {
-            get { return this.filePath; }
-            set { this.filePath = value; }
-        }
-        
     }
 }
