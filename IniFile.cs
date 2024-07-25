@@ -20,19 +20,6 @@ namespace FolderSaver
         int size,
         string filePath);
 
-        //[DllImport("kernel32")]
-        //private static extern long WritePrivateProfileString(string section,
-        //string key,
-        //string val,
-        //string filePath);
-
-        //[DllImport("kernel32")]
-        //private static extern int GetPrivateProfileString(int Section,
-        //string Key,
-        //string Value,
-        //[MarshalAs(UnmanagedType.LPArray)] byte[] Result,
-        //int Size, string FileName);
-
         public bool HasHotKey(string section, string hotKey)
         {
             if (Read(section, hotKey).Equals("true", StringComparison.OrdinalIgnoreCase))
@@ -41,25 +28,10 @@ namespace FolderSaver
             }
             return false;
         }
-        // public bool HasALT(string section, string hotKey) {
-        //     if (Read(section, hotKey).Equals("true", StringComparison.OrdinalIgnoreCase))
-        //     {
-        //         return true;
-        //     }
-        //     return false;
-        // }
-        // public bool HasSHIFT(string section, string hotKey)
-        // {
-        //     if (Read(section, hotKey).Equals("true", StringComparison.OrdinalIgnoreCase))
-        //     {
-        //         return true;
-        //     }
-        //     return false;
-        // }
 
         public string GetModifierKey(string section, string hotKey)
         {
-            return Read("Save", "MODIFIER");
+            return Read(section, hotKey);
         }
 
         private string Read(string section, string key)

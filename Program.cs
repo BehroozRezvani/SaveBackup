@@ -50,31 +50,7 @@ namespace FolderSaver
         {
             // uint modifier = 0;
             Console.WriteLine(System.AppContext.BaseDirectory);
-            string iniFilePath = Path.Combine(System.AppContext.BaseDirectory, "config.ini");
-            // if (File.Exists(iniFilePath))
-            // {
-            //     IniFile iniFile = new(iniFilePath);
-            //     if (iniFile.HasHotKey("Save", "ALT"))
-            //     {
-            //         modifier |= MOD_ALT;
-            //     }
-            //     if (iniFile.HasHotKey("Save", "CTRL"))
-            //     {
-            //         modifier |= MOD_CONTROL;
-            //     }
-            //     if (iniFile.HasHotKey("Save", "SHIFT"))
-            //     {
-            //         modifier |= MOD_SHIFT;
-            //     }
-
-            // }
-            // else 
-            // {
-            //     Console.WriteLine("INI file not found, defualt shortcuts will be used.\n");
-            //     Console.WriteLine("Save: CTRL + SHIFT + S");
-            //     Console.WriteLine("Restore: CTRL + SHIFT + Z");
-            //     Console.WriteLine("Quit: CTRL + SHIFT + Q");
-            // }
+            string iniFilePath = Path.Combine(System.AppContext.BaseDirectory, Strings.configFile);
 
             static uint GetHotKeys(string iniFilePath, string section)
             {
@@ -82,21 +58,21 @@ namespace FolderSaver
                 if (File.Exists(iniFilePath))
                 {
                     IniFile iniFile = new(iniFilePath);
-                    if (iniFile.HasHotKey("Save", "ALT"))
+                    if (iniFile.HasHotKey(section, Strings.ALT))
                     {
                         modifier |= MOD_ALT;
                     }
-                    if (iniFile.HasHotKey("Save", "CTRL"))
+                    if (iniFile.HasHotKey(section, Strings.CTRL))
                     {
                         modifier |= MOD_CONTROL;
                     }
-                    if (iniFile.HasHotKey("Save", "SHIFT"))
+                    if (iniFile.HasHotKey(section, Strings.SHIFT))
                     {
                         modifier |= MOD_SHIFT;
                     }
                     if(modifier == 0)
                     {
-                        Console.WriteLine("Config file was found but settings could not be loaded");
+                        Console.WriteLine(Strings.FileFoundNoConfig);
                     }
                 }
                 if(modifier == 0)
@@ -104,19 +80,19 @@ namespace FolderSaver
                     switch (section)
                     {
                         case "Save":
-                            Console.WriteLine("Save HotKeys could not be loaded, Save: CTRL + SHIFT + S");
+                            Console.WriteLine(Strings.SaveNotloaded, Strings.SaveHotkey);
                             break;
                         case "Restore":
-                             Console.WriteLine("Restore HotKeys could not be loaded, Save: CTRL + SHIFT + Z");
+                             Console.WriteLine(Strings.RestoreNotloaded, Strings.RestoreHotkey);
                              break;
                         case "Quit":
-                             Console.WriteLine("Quit HotKeys could not be loaded, Save: CTRL + SHIFT + Q");
+                             Console.WriteLine(Strings.QuitNotloaded, Strings.QuitHotkey);
                              break;
                         default:
-                            Console.WriteLine("Something went wrong, default shortcuts will be used.");
-                            Console.WriteLine("Save: CTRL + SHIFT + S");
-                            Console.WriteLine("Restore: CTRL + SHIFT + Z");
-                            Console.WriteLine("Quit: CTRL + SHIFT + Q");
+                            Console.WriteLine(Strings.SomethingWrongDefaultHotKey);
+                            Console.WriteLine(Strings.SaveHotkey);
+                            Console.WriteLine(Strings.RestoreHotkey);
+                            Console.WriteLine(Strings.QuitHotkey);
                         break;
                     }
                     modifier = MOD_CONTROL | MOD_SHIFT;
@@ -129,9 +105,9 @@ namespace FolderSaver
                 try
                 {
                     string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                    string zipFolder = Path.Combine(documentsPath, "NBGI_Backup");
-                    string sourceFolder = Path.Combine(documentsPath, "NBGI");
-                    string zipFile = Path.Combine(zipFolder, $"NBGI_{DateTime.Now:yyyyMMddHHmmss}.zip");
+                    string zipFolder = Path.Combine(documentsPath, Strings.ZipFolder);
+                    string sourceFolder = Path.Combine(documentsPath, Strings.SourceFolder);
+                    string zipFile = Path.Combine(zipFolder, $"{Strings.SourceFolder}_{DateTime.Now:yyyyMMddHHmmss}{Strings.dotZip}");
                     if (!Directory.Exists(zipFolder))
                     {
                         Directory.CreateDirectory(zipFolder);
@@ -153,13 +129,13 @@ namespace FolderSaver
                 try
                 {
                     string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                    string zipFolder = Path.Combine(documentsPath, "NBGI_Backup");
-                    string sourceFolder = Path.Combine(documentsPath, "NBGI");
+                    string zipFolder = Path.Combine(documentsPath, Strings.ZipFolder);
+                    string sourceFolder = Path.Combine(documentsPath, Strings.SourceFolder);
 
                     string zipFile = "";
                     foreach (string file in Directory.EnumerateFiles(zipFolder))
                     {
-                        if (!file.EndsWith(".zip"))
+                        if (!file.EndsWith(Strings.dotZip))
                         {
                             continue;
                         }
@@ -174,14 +150,14 @@ namespace FolderSaver
                     }
                     if (zipFile == "")
                     {
-                        Console.WriteLine("No backup file found");
+                        Console.WriteLine(Strings.FileNotFound);
                         //NotifyIcon notifyIcon = new NotifyIcon();
                         //notifyIcon.Icon = System.Drawing.SystemIcons.Warning;
                         //notifyIcon.Visible = true;
                         //notifyIcon.ShowBalloonTip(5000, "Completed", "This is a toast notification", ToolTipIcon.None);
                         return;
                     }
-                    Console.WriteLine($"Restoring from {zipFile}");
+                    Console.WriteLine($"{Strings.RestoreFrom} {zipFile}");
                     ZipArchive zip = ZipFile.OpenRead(zipFile);
                     ZipFile.ExtractToDirectory(zipFile, sourceFolder, true);
                 }
@@ -191,11 +167,9 @@ namespace FolderSaver
                 }
             }
 
-            uint atom = GlobalAddAtomA("ZipperHotKey");
-            uint atomRestore = GlobalAddAtomA("ZipperHotKeyRestore");
-            uint atomQuit = GlobalAddAtomA("ZipperHotKeyQuit");
-
-            // RegisterHotKey(0, atom, modifier, Keys.S);
+            uint atom = GlobalAddAtomA(Strings.ZipperHKSave);
+            uint atomRestore = GlobalAddAtomA(Strings.ZipperHKRestore);
+            uint atomQuit = GlobalAddAtomA(Strings.ZipperHKQuit);
 
             bool Save = RegisterHotKey(0, atom, MOD_CONTROL | MOD_SHIFT, Keys.S);
             bool Restore = RegisterHotKey(0, atomRestore, MOD_CONTROL | MOD_SHIFT, Keys.Z);
@@ -205,7 +179,7 @@ namespace FolderSaver
             while (GetMessageA(out msg, IntPtr.Zero, 0, 0) != 0)
             {
                 if (msg.message != WM_HOTKEY) continue;
-                System.Console.WriteLine("Hotkey pressed");
+                System.Console.WriteLine(Strings.HKPressed);
                 if (msg.wParam == atom)
                 {
                     ZipFolder();
