@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing.Text;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -32,31 +33,31 @@ namespace FolderSaver
         //[MarshalAs(UnmanagedType.LPArray)] byte[] Result,
         //int Size, string FileName);
 
-        public bool HasCTRL()
+        public bool HasHotKey(string section, string hotKey)
         {
-            if (Read("Save", "CTRL").Equals("true", StringComparison.OrdinalIgnoreCase))
+            if (Read(section, hotKey).Equals("true", StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
             return false;
         }
-        public bool HasALT() {
-            if (Read("Save", "ALT").Equals("true", StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-            return false;
-        }
-        public bool HasSHIFT()
-        {
-            if (Read("Save", "SHIFT").Equals("true", StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-            return false;
-        }
+        // public bool HasALT(string section, string hotKey) {
+        //     if (Read(section, hotKey).Equals("true", StringComparison.OrdinalIgnoreCase))
+        //     {
+        //         return true;
+        //     }
+        //     return false;
+        // }
+        // public bool HasSHIFT(string section, string hotKey)
+        // {
+        //     if (Read(section, hotKey).Equals("true", StringComparison.OrdinalIgnoreCase))
+        //     {
+        //         return true;
+        //     }
+        //     return false;
+        // }
 
-        public string GetModifierKey()
+        public string GetModifierKey(string section, string hotKey)
         {
             return Read("Save", "MODIFIER");
         }

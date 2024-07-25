@@ -48,32 +48,80 @@ namespace FolderSaver
 
         public static void Main()
         {
-            uint modifier = 0;
+            // uint modifier = 0;
             Console.WriteLine(System.AppContext.BaseDirectory);
             string iniFilePath = Path.Combine(System.AppContext.BaseDirectory, "config.ini");
-            if (File.Exists(iniFilePath))
-            {
-                IniFile iniFile = new(iniFilePath);
-                if (iniFile.HasALT())
-                {
-                    modifier |= MOD_ALT;
-                }
-                if (iniFile.HasCTRL())
-                {
-                    modifier |= MOD_CONTROL;
-                }
-                if (iniFile.HasSHIFT())
-                {
-                    modifier |= MOD_SHIFT;
-                }
+            // if (File.Exists(iniFilePath))
+            // {
+            //     IniFile iniFile = new(iniFilePath);
+            //     if (iniFile.HasHotKey("Save", "ALT"))
+            //     {
+            //         modifier |= MOD_ALT;
+            //     }
+            //     if (iniFile.HasHotKey("Save", "CTRL"))
+            //     {
+            //         modifier |= MOD_CONTROL;
+            //     }
+            //     if (iniFile.HasHotKey("Save", "SHIFT"))
+            //     {
+            //         modifier |= MOD_SHIFT;
+            //     }
 
-            }
-            else 
+            // }
+            // else 
+            // {
+            //     Console.WriteLine("INI file not found, defualt shortcuts will be used.\n");
+            //     Console.WriteLine("Save: CTRL + SHIFT + S");
+            //     Console.WriteLine("Restore: CTRL + SHIFT + Z");
+            //     Console.WriteLine("Quit: CTRL + SHIFT + Q");
+            // }
+
+            static uint GetHotKeys(string iniFilePath, string section)
             {
-                Console.WriteLine("INI file not found, defualt shortcuts will be used.\n");
-                Console.WriteLine("Save: CTRL + SHIFT + S");
-                Console.WriteLine("Restore: CTRL + SHIFT + Z");
-                Console.WriteLine("Quit: CTRL + SHIFT + Q");
+                uint modifier = 0;
+                if (File.Exists(iniFilePath))
+                {
+                    IniFile iniFile = new(iniFilePath);
+                    if (iniFile.HasHotKey("Save", "ALT"))
+                    {
+                        modifier |= MOD_ALT;
+                    }
+                    if (iniFile.HasHotKey("Save", "CTRL"))
+                    {
+                        modifier |= MOD_CONTROL;
+                    }
+                    if (iniFile.HasHotKey("Save", "SHIFT"))
+                    {
+                        modifier |= MOD_SHIFT;
+                    }
+                    if(modifier == 0)
+                    {
+                        Console.WriteLine("Config file was found but settings could not be loaded");
+                    }
+                }
+                if(modifier == 0)
+                {
+                    switch (section)
+                    {
+                        case "Save":
+                            Console.WriteLine("Save HotKeys could not be loaded, Save: CTRL + SHIFT + S");
+                            break;
+                        case "Restore":
+                             Console.WriteLine("Restore HotKeys could not be loaded, Save: CTRL + SHIFT + Z");
+                             break;
+                        case "Quit":
+                             Console.WriteLine("Quit HotKeys could not be loaded, Save: CTRL + SHIFT + Q");
+                             break;
+                        default:
+                            Console.WriteLine("Something went wrong, default shortcuts will be used.");
+                            Console.WriteLine("Save: CTRL + SHIFT + S");
+                            Console.WriteLine("Restore: CTRL + SHIFT + Z");
+                            Console.WriteLine("Quit: CTRL + SHIFT + Q");
+                        break;
+                    }
+                    modifier = MOD_CONTROL | MOD_SHIFT;
+                }
+                return modifier;
             }
 
             static void ZipFolder()
@@ -88,12 +136,10 @@ namespace FolderSaver
                     {
                         Directory.CreateDirectory(zipFolder);
                     }
-                    using (ZipArchive zip = ZipFile.Open(zipFile, ZipArchiveMode.Create))
+                    using ZipArchive zip = ZipFile.Open(zipFile, ZipArchiveMode.Create);
+                    foreach (string file in Directory.EnumerateFiles(sourceFolder, "*", SearchOption.AllDirectories))
                     {
-                        foreach (string file in Directory.EnumerateFiles(sourceFolder, "*", SearchOption.AllDirectories))
-                        {
-                            zip.CreateEntryFromFile(file, Path.GetRelativePath(sourceFolder, file));
-                        }
+                        zip.CreateEntryFromFile(file, Path.GetRelativePath(sourceFolder, file));
                     }
                 }
                 catch (Exception ex)
@@ -149,7 +195,7 @@ namespace FolderSaver
             uint atomRestore = GlobalAddAtomA("ZipperHotKeyRestore");
             uint atomQuit = GlobalAddAtomA("ZipperHotKeyQuit");
 
-            RegisterHotKey(0, atom, modifier, Keys.S);
+            // RegisterHotKey(0, atom, modifier, Keys.S);
 
             bool Save = RegisterHotKey(0, atom, MOD_CONTROL | MOD_SHIFT, Keys.S);
             bool Restore = RegisterHotKey(0, atomRestore, MOD_CONTROL | MOD_SHIFT, Keys.Z);
