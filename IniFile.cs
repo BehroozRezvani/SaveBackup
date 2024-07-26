@@ -17,12 +17,14 @@ namespace FolderSaver
 
         public bool HasHotKey(string section, string hotKey)
         {
-            if (Read(section, hotKey).Equals("true", StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-            return false;
+            return Read(section, hotKey).Equals("true", StringComparison.OrdinalIgnoreCase);
         }
+
+        public string GetSaveFolder()
+        {
+            return Read("SourceFolder", "Path") ?? string.Empty;
+        }
+
 
         public string GetModifierKey(string section, string hotKey)
         {

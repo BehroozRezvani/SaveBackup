@@ -45,7 +45,6 @@ namespace FolderSaver
 
         public static void Main()
         {
-            // uint modifier = 0;
             Console.WriteLine(System.AppContext.BaseDirectory);
             string iniFilePath = Path.Combine(System.AppContext.BaseDirectory, Strings.configFile);
 
