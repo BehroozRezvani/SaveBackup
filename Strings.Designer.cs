@@ -124,6 +124,15 @@ namespace FolderSaver {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Quit.
+        /// </summary>
+        internal static string Quit {
+            get {
+                return ResourceManager.GetString("Quit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Quit: CTRL + SHIFT + Q.
         /// </summary>
         internal static string QuitHotkey {

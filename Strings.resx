@@ -138,6 +138,9 @@
   <data name="HKPressed" xml:space="preserve">
     <value>Hotkey Pressed!</value>
   </data>
+  <data name="Quit" xml:space="preserve">
+    <value>Quit</value>
+  </data>
   <data name="QuitHotkey" xml:space="preserve">
     <value>Quit: CTRL + SHIFT + Q</value>
   </data>

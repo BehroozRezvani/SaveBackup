@@ -46,10 +46,10 @@ namespace FolderSaver
         public static void Main()
         {
             Console.WriteLine(System.AppContext.BaseDirectory);
-            string iniFilePath = Path.Combine(System.AppContext.BaseDirectory, Strings.configFile);
 
-            static uint GetHotKeys(string iniFilePath, string section)
+            static uint GetHotKeys(string section)
             {
+                string iniFilePath = Path.Combine(System.AppContext.BaseDirectory, Strings.configFile);
                 uint modifier = 0;
                 if (File.Exists(iniFilePath))
                 {
@@ -163,40 +163,40 @@ namespace FolderSaver
                 }
             }
 
-            uint atom = GlobalAddAtomA(Strings.ZipperHKSave);
-            uint atomRestore = GlobalAddAtomA(Strings.ZipperHKRestore);
-            uint atomQuit = GlobalAddAtomA(Strings.ZipperHKQuit);
+            uint saveAtom = GlobalAddAtomA(Strings.ZipperHKSave);
+            uint restoreAtom = GlobalAddAtomA(Strings.ZipperHKRestore);
+            uint quitAtom = GlobalAddAtomA(Strings.ZipperHKQuit);
 
-            bool Save = RegisterHotKey(0, atom, MOD_CONTROL | MOD_SHIFT, Keys.S);
-            bool Restore = RegisterHotKey(0, atomRestore, MOD_CONTROL | MOD_SHIFT, Keys.Z);
-            bool Quit = RegisterHotKey(0, atomQuit, MOD_CONTROL | MOD_SHIFT, Keys.Q);
+            RegisterHotKey(0, saveAtom, GetHotKeys(Strings.Save), Keys.S);
+            RegisterHotKey(0, restoreAtom, GetHotKeys(Strings.Restore), Keys.Z);
+            RegisterHotKey(0, quitAtom, GetHotKeys(Strings.Quit), Keys.Q);
 
-            MSG msg;
-            while (GetMessageA(out msg, IntPtr.Zero, 0, 0) != 0)
+            //MSG msg;
+            while (GetMessageA(out MSG msg, IntPtr.Zero, 0, 0) != 0)
             {
                 if (msg.message != WM_HOTKEY) continue;
                 System.Console.WriteLine(Strings.HKPressed);
-                if (msg.wParam == atom)
+                if (msg.wParam == saveAtom)
                 {
                     ZipFolder();
                 }
-                else if (msg.wParam == atomRestore)
+                else if (msg.wParam == restoreAtom)
                 {
                     RestoreFolder();
                 }
-                else if (msg.wParam == atomQuit)
+                else if (msg.wParam == quitAtom)
                 {
                     break;
                 }
             }
 
-            UnregisterHotKey(0, atom);
-            UnregisterHotKey(0, atomRestore);
-            UnregisterHotKey(0, atomQuit);
+            UnregisterHotKey(0, saveAtom);
+            UnregisterHotKey(0, restoreAtom);
+            UnregisterHotKey(0, quitAtom);
 
-            GlobalDeleteAtom(atom);
-            GlobalDeleteAtom(atomRestore);
-            GlobalDeleteAtom(atomQuit);
+            GlobalDeleteAtom(saveAtom);
+            GlobalDeleteAtom(restoreAtom);
+            GlobalDeleteAtom(quitAtom);
         }        
     }
 }
