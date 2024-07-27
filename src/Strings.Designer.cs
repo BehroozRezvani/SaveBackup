@@ -70,6 +70,15 @@ namespace SaveBackup.src {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Buffer size is too small to hold the entire string value..
+        /// </summary>
+        internal static string BufferTooSmall {
+            get {
+                return ResourceManager.GetString("BufferTooSmall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to config.ini.
         /// </summary>
         internal static string configFile {
@@ -93,6 +102,15 @@ namespace SaveBackup.src {
         internal static string dotZip {
             get {
                 return ResourceManager.GetString("dotZip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error reading INI file..
+        /// </summary>
+        internal static string ErrorReadingIni {
+            get {
+                return ResourceManager.GetString("ErrorReadingIni", resourceCulture);
             }
         }
         
@@ -138,6 +156,15 @@ namespace SaveBackup.src {
         internal static string NBGIBackup {
             get {
                 return ResourceManager.GetString("NBGIBackup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Path.
+        /// </summary>
+        internal static string Path {
+            get {
+                return ResourceManager.GetString("Path", resourceCulture);
             }
         }
         
@@ -255,6 +282,15 @@ namespace SaveBackup.src {
         internal static string SourceFolder {
             get {
                 return ResourceManager.GetString("SourceFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to true.
+        /// </summary>
+        internal static string True {
+            get {
+                return ResourceManager.GetString("True", resourceCulture);
             }
         }
         

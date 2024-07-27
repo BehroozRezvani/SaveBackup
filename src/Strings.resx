@@ -120,6 +120,9 @@
   <data name="ALT" xml:space="preserve">
     <value>ALT</value>
   </data>
+  <data name="BufferTooSmall" xml:space="preserve">
+    <value>Buffer size is too small to hold the entire string value.</value>
+  </data>
   <data name="configFile" xml:space="preserve">
     <value>config.ini</value>
   </data>
@@ -128,6 +131,9 @@
   </data>
   <data name="dotZip" xml:space="preserve">
     <value>.zip</value>
+  </data>
+  <data name="ErrorReadingIni" xml:space="preserve">
+    <value>Error reading INI file.</value>
   </data>
   <data name="FileFoundNoConfig" xml:space="preserve">
     <value>Config file was found but settings could not be loaded</value>
@@ -143,6 +149,9 @@
   </data>
   <data name="NBGIBackup" xml:space="preserve">
     <value>NBGI_Backup</value>
+  </data>
+  <data name="Path" xml:space="preserve">
+    <value>Path</value>
   </data>
   <data name="Quit" xml:space="preserve">
     <value>Quit</value>
@@ -182,6 +191,9 @@
   </data>
   <data name="SourceFolder" xml:space="preserve">
     <value>SourceFolder</value>
+  </data>
+  <data name="True" xml:space="preserve">
+    <value>true</value>
   </data>
   <data name="ZipperHKQuit" xml:space="preserve">
     <value>ZipperHotKeyQuit</value>

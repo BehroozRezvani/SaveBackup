@@ -43,132 +43,132 @@ namespace SaveBackup.src
         const uint MOD_SHIFT = 0x0004;
         const uint WM_HOTKEY = 0x0312;
 
-        public static void Main()
+        private static void ZipFolder()
+        {
+            try
+            {
+                string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                string zipFolder = Path.Combine(documentsPath, Strings.NBGIBackup);
+                string sourceFolder = Path.Combine(documentsPath, Strings.NBGI);
+                string zipFile = Path.Combine(zipFolder, $"{Strings.NBGI}_{DateTime.Now:yyyyMMddHHmmss}{Strings.dotZip}");
+                if (!Directory.Exists(zipFolder))
+                {
+                    Directory.CreateDirectory(zipFolder);
+                }
+                using ZipArchive zip = ZipFile.Open(zipFile, ZipArchiveMode.Create);
+                foreach (string file in Directory.EnumerateFiles(sourceFolder, "*", SearchOption.AllDirectories))
+                {
+                    zip.CreateEntryFromFile(file, Path.GetRelativePath(sourceFolder, file));
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private static uint GetHotKeys(string section)
         {
             string iniFilePath = Path.Combine(AppContext.BaseDirectory, Strings.configFile);
             IniFile iniFile = new(iniFilePath);
-            Console.WriteLine(AppContext.BaseDirectory);
-            Console.WriteLine(iniFile.GetSaveFolder());
-
-            static uint GetHotKeys(string section)
+            uint modifier = 0;
+            if (File.Exists(iniFilePath))
             {
-                string iniFilePath = Path.Combine(AppContext.BaseDirectory, Strings.configFile);
-                IniFile iniFile = new(iniFilePath);
-                uint modifier = 0;
-                if (File.Exists(iniFilePath))
+                if (iniFile.HasHotKey(section, Strings.ALT))
                 {
-                    if (iniFile.HasHotKey(section, Strings.ALT))
-                    {
-                        modifier |= MOD_ALT;
-                    }
-                    if (iniFile.HasHotKey(section, Strings.CTRL))
-                    {
-                        modifier |= MOD_CONTROL;
-                    }
-                    if (iniFile.HasHotKey(section, Strings.SHIFT))
-                    {
-                        modifier |= MOD_SHIFT;
-                    }
-                    if (modifier == 0)
-                    {
-                        Console.WriteLine(Strings.FileFoundNoConfig);
-                    }
+                    modifier |= MOD_ALT;
+                }
+                if (iniFile.HasHotKey(section, Strings.CTRL))
+                {
+                    modifier |= MOD_CONTROL;
+                }
+                if (iniFile.HasHotKey(section, Strings.SHIFT))
+                {
+                    modifier |= MOD_SHIFT;
                 }
                 if (modifier == 0)
                 {
-                    switch (section)
-                    {
-                        case "Save":
-                            Console.WriteLine(Strings.SaveNotloaded, Strings.SaveHotkey);
-                            break;
-                        case "Restore":
-                            Console.WriteLine(Strings.RestoreNotloaded, Strings.RestoreHotkey);
-                            break;
-                        case "Quit":
-                            Console.WriteLine(Strings.QuitNotloaded, Strings.QuitHotkey);
-                            break;
-                        default:
-                            Console.WriteLine(Strings.SomethingWrongDefaultHotKey);
-                            Console.WriteLine(Strings.SaveHotkey);
-                            Console.WriteLine(Strings.RestoreHotkey);
-                            Console.WriteLine(Strings.QuitHotkey);
-                            break;
-                    }
-                    modifier = MOD_CONTROL | MOD_SHIFT;
-                }
-                return modifier;
-            }
-
-            static void ZipFolder()
-            {
-                try
-                {
-                    string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                    string zipFolder = Path.Combine(documentsPath, Strings.NBGIBackup);
-                    string sourceFolder = Path.Combine(documentsPath, Strings.NBGI);
-                    string zipFile = Path.Combine(zipFolder, $"{Strings.NBGI}_{DateTime.Now:yyyyMMddHHmmss}{Strings.dotZip}");
-                    if (!Directory.Exists(zipFolder))
-                    {
-                        Directory.CreateDirectory(zipFolder);
-                    }
-                    using ZipArchive zip = ZipFile.Open(zipFile, ZipArchiveMode.Create);
-                    foreach (string file in Directory.EnumerateFiles(sourceFolder, "*", SearchOption.AllDirectories))
-                    {
-                        zip.CreateEntryFromFile(file, Path.GetRelativePath(sourceFolder, file));
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
+                    Console.WriteLine(Strings.FileFoundNoConfig);
                 }
             }
-
-            static void RestoreFolder()
+            if (modifier == 0)
             {
-                try
+                switch (section)
                 {
-                    string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                    string zipFolder = Path.Combine(documentsPath, Strings.NBGIBackup);
-                    string sourceFolder = Path.Combine(documentsPath, Strings.NBGI);
+                    case "Save":
+                        Console.WriteLine(Strings.SaveNotloaded, Strings.SaveHotkey);
+                        break;
+                    case "Restore":
+                        Console.WriteLine(Strings.RestoreNotloaded, Strings.RestoreHotkey);
+                        break;
+                    case "Quit":
+                        Console.WriteLine(Strings.QuitNotloaded, Strings.QuitHotkey);
+                        break;
+                    default:
+                        Console.WriteLine(Strings.SomethingWrongDefaultHotKey);
+                        Console.WriteLine(Strings.SaveHotkey);
+                        Console.WriteLine(Strings.RestoreHotkey);
+                        Console.WriteLine(Strings.QuitHotkey);
+                        break;
+                }
+                modifier = MOD_CONTROL | MOD_SHIFT;
+            }
+            return modifier;
+        }
 
-                    string zipFile = "";
-                    foreach (string file in Directory.EnumerateFiles(zipFolder))
+        private static void RestoreFolder()
+        {
+            try
+            {
+                string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                string zipFolder = Path.Combine(documentsPath, Strings.NBGIBackup);
+                string sourceFolder = Path.Combine(documentsPath, Strings.NBGI);
+
+                string zipFile = "";
+                foreach (string file in Directory.EnumerateFiles(zipFolder))
+                {
+                    if (!file.EndsWith(Strings.dotZip))
                     {
-                        if (!file.EndsWith(Strings.dotZip))
-                        {
-                            continue;
-                        }
-                        if (zipFile == "")
-                        {
-                            zipFile = file;
-                        }
-                        if (string.Compare(zipFile, file) < 0)
-                        {
-                            zipFile = file;
-                        }
+                        continue;
                     }
                     if (zipFile == "")
                     {
-                        Console.WriteLine(Strings.FileNotFound);
-                        //NotifyIcon notifyIcon = new NotifyIcon();
-                        //notifyIcon.Icon = System.Drawing.SystemIcons.Warning;
-                        //notifyIcon.Visible = true;
-                        //notifyIcon.ShowBalloonTip(5000, "Completed", "This is a toast notification", ToolTipIcon.None);
-                        return;
+                        zipFile = file;
                     }
-                    Console.WriteLine($"{Strings.RestoreFrom} {zipFile}");
-                    ZipArchive zip = ZipFile.OpenRead(zipFile);
-                    ZipFile.ExtractToDirectory(zipFile, sourceFolder, true);
+                    if (string.Compare(zipFile, file) < 0)
+                    {
+                        zipFile = file;
+                    }
                 }
-                catch (Exception ex)
+                if (zipFile == "")
                 {
-                    Console.WriteLine(ex.Message);
+                    Console.WriteLine(Strings.FileNotFound);
+                    //NotifyIcon notifyIcon = new NotifyIcon();
+                    //notifyIcon.Icon = System.Drawing.SystemIcons.Warning;
+                    //notifyIcon.Visible = true;
+                    //notifyIcon.ShowBalloonTip(5000, "Completed", "This is a toast notification", ToolTipIcon.None);
+                    return;
                 }
+                Console.WriteLine($"{Strings.RestoreFrom} {zipFile}");
+                ZipArchive zip = ZipFile.OpenRead(zipFile);
+                ZipFile.ExtractToDirectory(zipFile, sourceFolder, true);
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
 
-            uint saveAtom = GlobalAddAtomA(Strings.ZipperHKSave);
-            uint restoreAtom = GlobalAddAtomA(Strings.ZipperHKRestore);
-            uint quitAtom = GlobalAddAtomA(Strings.ZipperHKQuit);
+        private static uint GetAtom(string atomName)
+        {
+            return GlobalAddAtomA(atomName);
+        }
+
+        public static void Main()
+        {
+            uint saveAtom = GetAtom(Strings.ZipperHKSave);
+            uint restoreAtom = GetAtom(Strings.ZipperHKRestore);
+            uint quitAtom = GetAtom(Strings.ZipperHKQuit);
 
             RegisterHotKey(0, saveAtom, GetHotKeys(Strings.Save), Keys.S);
             RegisterHotKey(0, restoreAtom, GetHotKeys(Strings.Restore), Keys.Z);

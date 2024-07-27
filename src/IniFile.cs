@@ -17,7 +17,7 @@ namespace SaveBackup.src
 
         public bool HasHotKey(string section, string hotKey)
         {
-            return Read(section, hotKey).Equals("true", StringComparison.OrdinalIgnoreCase);
+            return Read(section, hotKey).Equals(Strings.True, StringComparison.OrdinalIgnoreCase);
         }
 
         public string GetModifierKey(string section, string hotKey)
@@ -27,7 +27,7 @@ namespace SaveBackup.src
 
         public string GetSaveFolder()
         {
-            string folderPath = Read(Strings.SourceFolder, "Path");
+            string folderPath = Read(Strings.SourceFolder, Strings.Path);
             return string.IsNullOrEmpty(folderPath) ?
                 Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) :
                 folderPath;
@@ -39,11 +39,11 @@ namespace SaveBackup.src
             int result = GetPrivateProfileString(section, key, "", SB, 255, FilePath);
             if (result == 0)
             {
-                throw new Exception("Error reading INI file.");
+                throw new Exception(Strings.ErrorReadingIni);
             }
             else if (result == 255)
             {
-                throw new Exception("Buffer size is too small to hold the entire string value.");
+                throw new Exception(Strings.BufferTooSmall);
             }
             return SB.ToString();
         }
