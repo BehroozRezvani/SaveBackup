@@ -27,12 +27,10 @@ namespace FolderSaver
 
         public string GetSaveFolder()
         {
-            string folderPath = Read("SourceFolder", "Path");
-            if (string.IsNullOrEmpty(folderPath))
-            {
-                folderPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            }
-            return folderPath;
+            string folderPath = Read(Strings.SourceFolder, "Path");
+            return string.IsNullOrEmpty(folderPath) ?
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) :
+                folderPath;
         }
 
         public string Read(string section, string key)
@@ -43,7 +41,7 @@ namespace FolderSaver
             {
                 throw new Exception("Error reading INI file.");
             }
-            else if (result == 254)
+            else if (result == 255)
             {
                 throw new Exception("Buffer size is too small to hold the entire string value.");
             }

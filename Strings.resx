@@ -138,6 +138,12 @@
   <data name="HKPressed" xml:space="preserve">
     <value>Hotkey Pressed!</value>
   </data>
+  <data name="NBGI" xml:space="preserve">
+    <value>NBGI</value>
+  </data>
+  <data name="NBGIBackup" xml:space="preserve">
+    <value>NBGI_Backup</value>
+  </data>
   <data name="Quit" xml:space="preserve">
     <value>Quit</value>
   </data>
@@ -175,10 +181,7 @@
     <value>Something went wrong, default Hotkeys will be used.</value>
   </data>
   <data name="SourceFolder" xml:space="preserve">
-    <value>NBGI</value>
-  </data>
-  <data name="ZipFolder" xml:space="preserve">
-    <value>NBGI_Backup</value>
+    <value>SourceFolder</value>
   </data>
   <data name="ZipperHKQuit" xml:space="preserve">
     <value>ZipperHotKeyQuit</value>

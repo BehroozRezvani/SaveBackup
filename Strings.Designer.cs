@@ -124,6 +124,24 @@ namespace FolderSaver {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to NBGI.
+        /// </summary>
+        internal static string NBGI {
+            get {
+                return ResourceManager.GetString("NBGI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NBGI_Backup.
+        /// </summary>
+        internal static string NBGIBackup {
+            get {
+                return ResourceManager.GetString("NBGIBackup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Quit.
         /// </summary>
         internal static string Quit {
@@ -232,20 +250,11 @@ namespace FolderSaver {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to NBGI.
+        ///   Looks up a localized string similar to SourceFolder.
         /// </summary>
         internal static string SourceFolder {
             get {
                 return ResourceManager.GetString("SourceFolder", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to NBGI_Backup.
-        /// </summary>
-        internal static string ZipFolder {
-            get {
-                return ResourceManager.GetString("ZipFolder", resourceCulture);
             }
         }
         

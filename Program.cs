@@ -45,15 +45,18 @@ namespace FolderSaver
 
         public static void Main()
         {
+            string iniFilePath = Path.Combine(System.AppContext.BaseDirectory, Strings.configFile);
+            IniFile iniFile = new(iniFilePath);
             Console.WriteLine(System.AppContext.BaseDirectory);
+            Console.WriteLine(iniFile.GetSaveFolder());
 
             static uint GetHotKeys(string section)
             {
                 string iniFilePath = Path.Combine(System.AppContext.BaseDirectory, Strings.configFile);
+                IniFile iniFile = new(iniFilePath);
                 uint modifier = 0;
                 if (File.Exists(iniFilePath))
                 {
-                    IniFile iniFile = new(iniFilePath);
                     if (iniFile.HasHotKey(section, Strings.ALT))
                     {
                         modifier |= MOD_ALT;
@@ -101,9 +104,9 @@ namespace FolderSaver
                 try
                 {
                     string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                    string zipFolder = Path.Combine(documentsPath, Strings.ZipFolder);
-                    string sourceFolder = Path.Combine(documentsPath, Strings.SourceFolder);
-                    string zipFile = Path.Combine(zipFolder, $"{Strings.SourceFolder}_{DateTime.Now:yyyyMMddHHmmss}{Strings.dotZip}");
+                    string zipFolder = Path.Combine(documentsPath, Strings.NBGIBackup);
+                    string sourceFolder = Path.Combine(documentsPath, Strings.NBGI);
+                    string zipFile = Path.Combine(zipFolder, $"{Strings.NBGI}_{DateTime.Now:yyyyMMddHHmmss}{Strings.dotZip}");
                     if (!Directory.Exists(zipFolder))
                     {
                         Directory.CreateDirectory(zipFolder);
@@ -125,8 +128,8 @@ namespace FolderSaver
                 try
                 {
                     string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                    string zipFolder = Path.Combine(documentsPath, Strings.ZipFolder);
-                    string sourceFolder = Path.Combine(documentsPath, Strings.SourceFolder);
+                    string zipFolder = Path.Combine(documentsPath, Strings.NBGIBackup);
+                    string sourceFolder = Path.Combine(documentsPath, Strings.NBGI);
 
                     string zipFile = "";
                     foreach (string file in Directory.EnumerateFiles(zipFolder))
