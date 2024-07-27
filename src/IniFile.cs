@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
 
-namespace FolderSaver
+namespace SaveBackup.src
 {
     public class IniFile(string filePath)
     {

@@ -1,7 +1,7 @@
 ﻿using System.IO.Compression;
 using System.Runtime.InteropServices;
 
-namespace FolderSaver
+namespace SaveBackup.src
 {
     public partial class Zippy
     {
@@ -12,12 +12,12 @@ namespace FolderSaver
         internal static extern ushort GlobalDeleteAtom(uint nAtom);
 
         [DllImport("user32.dll", SetLastError = true)]
-        private static extern bool RegisterHotKey(IntPtr hWnd, uint keyId, uint fsModifiers, Keys vk);
+        private static extern bool RegisterHotKey(nint hWnd, uint keyId, uint fsModifiers, Keys vk);
 
         [DllImport("user32.dll", SetLastError = true)]
-        private static extern bool UnregisterHotKey(IntPtr hWnd, uint id);
+        private static extern bool UnregisterHotKey(nint hWnd, uint id);
         [DllImport("user32.dll")]
-        static extern int GetMessageA(out MSG lpMsg, IntPtr hWnd, uint wMsgFilterMin, uint wMsgFilterMax);
+        static extern int GetMessageA(out MSG lpMsg, nint hWnd, uint wMsgFilterMin, uint wMsgFilterMax);
 
         [StructLayout(LayoutKind.Sequential)]
         public struct POINT
@@ -29,10 +29,10 @@ namespace FolderSaver
         [StructLayout(LayoutKind.Sequential)]
         public struct MSG
         {
-            readonly IntPtr hwnd;
+            readonly nint hwnd;
             public uint message;
-            public UIntPtr wParam;
-            readonly IntPtr lParam;
+            public nuint wParam;
+            readonly nint lParam;
             readonly int time;
             readonly POINT pt;
             readonly int lPrivate;
@@ -45,14 +45,14 @@ namespace FolderSaver
 
         public static void Main()
         {
-            string iniFilePath = Path.Combine(System.AppContext.BaseDirectory, Strings.configFile);
+            string iniFilePath = Path.Combine(AppContext.BaseDirectory, Strings.configFile);
             IniFile iniFile = new(iniFilePath);
-            Console.WriteLine(System.AppContext.BaseDirectory);
+            Console.WriteLine(AppContext.BaseDirectory);
             Console.WriteLine(iniFile.GetSaveFolder());
 
             static uint GetHotKeys(string section)
             {
-                string iniFilePath = Path.Combine(System.AppContext.BaseDirectory, Strings.configFile);
+                string iniFilePath = Path.Combine(AppContext.BaseDirectory, Strings.configFile);
                 IniFile iniFile = new(iniFilePath);
                 uint modifier = 0;
                 if (File.Exists(iniFilePath))
@@ -69,12 +69,12 @@ namespace FolderSaver
                     {
                         modifier |= MOD_SHIFT;
                     }
-                    if(modifier == 0)
+                    if (modifier == 0)
                     {
                         Console.WriteLine(Strings.FileFoundNoConfig);
                     }
                 }
-                if(modifier == 0)
+                if (modifier == 0)
                 {
                     switch (section)
                     {
@@ -82,17 +82,17 @@ namespace FolderSaver
                             Console.WriteLine(Strings.SaveNotloaded, Strings.SaveHotkey);
                             break;
                         case "Restore":
-                             Console.WriteLine(Strings.RestoreNotloaded, Strings.RestoreHotkey);
-                             break;
+                            Console.WriteLine(Strings.RestoreNotloaded, Strings.RestoreHotkey);
+                            break;
                         case "Quit":
-                             Console.WriteLine(Strings.QuitNotloaded, Strings.QuitHotkey);
-                             break;
+                            Console.WriteLine(Strings.QuitNotloaded, Strings.QuitHotkey);
+                            break;
                         default:
                             Console.WriteLine(Strings.SomethingWrongDefaultHotKey);
                             Console.WriteLine(Strings.SaveHotkey);
                             Console.WriteLine(Strings.RestoreHotkey);
                             Console.WriteLine(Strings.QuitHotkey);
-                        break;
+                            break;
                     }
                     modifier = MOD_CONTROL | MOD_SHIFT;
                 }
@@ -142,7 +142,7 @@ namespace FolderSaver
                         {
                             zipFile = file;
                         }
-                        if (String.Compare(zipFile, file) < 0)
+                        if (string.Compare(zipFile, file) < 0)
                         {
                             zipFile = file;
                         }
@@ -175,10 +175,10 @@ namespace FolderSaver
             RegisterHotKey(0, quitAtom, GetHotKeys(Strings.Quit), Keys.Q);
 
             //MSG msg;
-            while (GetMessageA(out MSG msg, IntPtr.Zero, 0, 0) != 0)
+            while (GetMessageA(out MSG msg, nint.Zero, 0, 0) != 0)
             {
                 if (msg.message != WM_HOTKEY) continue;
-                System.Console.WriteLine(Strings.HKPressed);
+                Console.WriteLine(Strings.HKPressed);
                 if (msg.wParam == saveAtom)
                 {
                     ZipFolder();
@@ -200,6 +200,6 @@ namespace FolderSaver
             GlobalDeleteAtom(saveAtom);
             GlobalDeleteAtom(restoreAtom);
             GlobalDeleteAtom(quitAtom);
-        }        
+        }
     }
 }
