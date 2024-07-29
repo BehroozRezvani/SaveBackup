@@ -141,8 +141,14 @@
   <data name="FileNotFound" xml:space="preserve">
     <value>No backup file found</value>
   </data>
+  <data name="Hello" xml:space="preserve">
+    <value>Hello!</value>
+  </data>
   <data name="HKPressed" xml:space="preserve">
     <value>Hotkey Pressed!</value>
+  </data>
+  <data name="InvalidModifier" xml:space="preserve">
+    <value>This Modifier key is not supported or you have not chosen a Modifier key!</value>
   </data>
   <data name="NBGI" xml:space="preserve">
     <value>NBGI</value>

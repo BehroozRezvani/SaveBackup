@@ -43,14 +43,16 @@ namespace SaveBackup.src
         const uint MOD_SHIFT = 0x0004;
         const uint WM_HOTKEY = 0x0312;
 
+        private static readonly Dictionary<string, Keys> keyMap = [];
+
         private static void ZipFolder()
         {
             try
             {
                 string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                string zipFolder = Path.Combine(documentsPath, Strings.NBGIBackup);
-                string sourceFolder = Path.Combine(documentsPath, Strings.NBGI);
-                string zipFile = Path.Combine(zipFolder, $"{Strings.NBGI}_{DateTime.Now:yyyyMMddHHmmss}{Strings.dotZip}");
+                string zipFolder = Path.Combine(documentsPath, Texts.NBGIBackup);
+                string sourceFolder = Path.Combine(documentsPath, Texts.NBGI);
+                string zipFile = Path.Combine(zipFolder, $"{Texts.NBGI}_{DateTime.Now:yyyyMMddHHmmss}{Texts.dotZip}");
                 if (!Directory.Exists(zipFolder))
                 {
                     Directory.CreateDirectory(zipFolder);
@@ -69,26 +71,26 @@ namespace SaveBackup.src
 
         private static uint GetHotKeys(string section)
         {
-            string iniFilePath = Path.Combine(AppContext.BaseDirectory, Strings.configFile);
+            string iniFilePath = Path.Combine(AppContext.BaseDirectory, Texts.configFile);
             IniFile iniFile = new(iniFilePath);
             uint modifier = 0;
             if (File.Exists(iniFilePath))
             {
-                if (iniFile.HasHotKey(section, Strings.ALT))
+                if (iniFile.HasHotKey(section, Texts.ALT))
                 {
                     modifier |= MOD_ALT;
                 }
-                if (iniFile.HasHotKey(section, Strings.CTRL))
+                if (iniFile.HasHotKey(section, Texts.CTRL))
                 {
                     modifier |= MOD_CONTROL;
                 }
-                if (iniFile.HasHotKey(section, Strings.SHIFT))
+                if (iniFile.HasHotKey(section, Texts.SHIFT))
                 {
                     modifier |= MOD_SHIFT;
                 }
                 if (modifier == 0)
                 {
-                    Console.WriteLine(Strings.FileFoundNoConfig);
+                    Console.WriteLine(Texts.FileFoundNoConfig);
                 }
             }
             if (modifier == 0)
@@ -96,19 +98,19 @@ namespace SaveBackup.src
                 switch (section)
                 {
                     case "Save":
-                        Console.WriteLine(Strings.SaveNotloaded, Strings.SaveHotkey);
+                        Console.WriteLine(Texts.SaveNotloaded, Texts.SaveHotkey);
                         break;
                     case "Restore":
-                        Console.WriteLine(Strings.RestoreNotloaded, Strings.RestoreHotkey);
+                        Console.WriteLine(Texts.RestoreNotloaded, Texts.RestoreHotkey);
                         break;
                     case "Quit":
-                        Console.WriteLine(Strings.QuitNotloaded, Strings.QuitHotkey);
+                        Console.WriteLine(Texts.QuitNotloaded, Texts.QuitHotkey);
                         break;
                     default:
-                        Console.WriteLine(Strings.SomethingWrongDefaultHotKey);
-                        Console.WriteLine(Strings.SaveHotkey);
-                        Console.WriteLine(Strings.RestoreHotkey);
-                        Console.WriteLine(Strings.QuitHotkey);
+                        Console.WriteLine(Texts.SomethingWrongDefaultHotKey);
+                        Console.WriteLine(Texts.SaveHotkey);
+                        Console.WriteLine(Texts.RestoreHotkey);
+                        Console.WriteLine(Texts.QuitHotkey);
                         break;
                 }
                 modifier = MOD_CONTROL | MOD_SHIFT;
@@ -121,13 +123,13 @@ namespace SaveBackup.src
             try
             {
                 string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                string zipFolder = Path.Combine(documentsPath, Strings.NBGIBackup);
-                string sourceFolder = Path.Combine(documentsPath, Strings.NBGI);
+                string zipFolder = Path.Combine(documentsPath, Texts.NBGIBackup);
+                string sourceFolder = Path.Combine(documentsPath, Texts.NBGI);
 
                 string zipFile = "";
                 foreach (string file in Directory.EnumerateFiles(zipFolder))
                 {
-                    if (!file.EndsWith(Strings.dotZip))
+                    if (!file.EndsWith(Texts.dotZip))
                     {
                         continue;
                     }
@@ -142,14 +144,14 @@ namespace SaveBackup.src
                 }
                 if (zipFile == "")
                 {
-                    Console.WriteLine(Strings.FileNotFound);
+                    Console.WriteLine(Texts.FileNotFound);
                     //NotifyIcon notifyIcon = new NotifyIcon();
                     //notifyIcon.Icon = System.Drawing.SystemIcons.Warning;
                     //notifyIcon.Visible = true;
                     //notifyIcon.ShowBalloonTip(5000, "Completed", "This is a toast notification", ToolTipIcon.None);
                     return;
                 }
-                Console.WriteLine($"{Strings.RestoreFrom} {zipFile}");
+                Console.WriteLine($"{Texts.RestoreFrom} {zipFile}");
                 ZipArchive zip = ZipFile.OpenRead(zipFile);
                 ZipFile.ExtractToDirectory(zipFile, sourceFolder, true);
             }
@@ -226,44 +228,75 @@ namespace SaveBackup.src
         //     { "NumPad9", Keys.NumPad9 }
         // };
 
-        private static readonly Dictionary<string, Keys> keyMap2 = [];
-
-
         private static void InitKeyMap()
         {
             for (char c = 'A'; c <= 'Z'; c++)
             {
-                keyMap2[c.ToString()] = (Keys)Enum.Parse(typeof(Keys), c.ToString());
+                keyMap[c.ToString()] = (Keys)Enum.Parse(typeof(Keys), c.ToString());
             }
             for (int i = 0; i <= 9; i++)
             {
-                keyMap2[i.ToString()] = (Keys)Enum.Parse(typeof(Keys), "D" + i);
+                keyMap[i.ToString()] = (Keys)Enum.Parse(typeof(Keys), "D" + i);
             }
             for (int i = 1; i <= 12; i++)
             {
-                keyMap2["F" + i] = (Keys)Enum.Parse(typeof(Keys), "F" + i);
+                keyMap["F" + i] = (Keys)Enum.Parse(typeof(Keys), "F" + i);
             }
             for (int i = 0; i <= 9; i++)
             {
-                keyMap2["NumPad" + i] = (Keys)Enum.Parse(typeof(Keys), "NumPad" + i);
+                keyMap["NumPad" + i] = (Keys)Enum.Parse(typeof(Keys), "NumPad" + i);
             }
+        }
+
+        private static Keys GetModKey(string section)
+        {
+            string iniFilePath = Path.Combine(AppContext.BaseDirectory, Texts.configFile);
+            IniFile iniFile = new(iniFilePath);
+            string modifier = iniFile.GetModifierKey(section);
+            if (File.Exists(iniFilePath) && modifier != "")
+            {
+                if (keyMap.TryGetValue(modifier, out Keys userKey))
+                {
+                    return userKey;
+                }
+            }
+            switch (section)
+            {
+                case "Save":
+                    Console.WriteLine(Texts.SaveNotloaded, Texts.SaveHotkey);
+                    return Keys.S;
+                case "Restore":
+                    Console.WriteLine(Texts.RestoreNotloaded, Texts.RestoreHotkey);
+                    return Keys.Z;
+                case "Quit":
+                    Console.WriteLine(Texts.QuitNotloaded, Texts.QuitHotkey);
+                    return Keys.Q;
+                default:
+                    Console.WriteLine(Texts.SomethingWrongDefaultHotKey);
+                    Console.WriteLine(Texts.SaveHotkey);
+                    Console.WriteLine(Texts.RestoreHotkey);
+                    Console.WriteLine(Texts.QuitHotkey);
+                    break;
+            }
+            return Keys.None;
         }
 
         public static void Main()
         {
-            uint saveAtom = GetAtom(Strings.ZipperHKSave);
-            uint restoreAtom = GetAtom(Strings.ZipperHKRestore);
-            uint quitAtom = GetAtom(Strings.ZipperHKQuit);
+            InitKeyMap();
+            uint saveAtom = GetAtom(Texts.ZipperHKSave);
+            uint restoreAtom = GetAtom(Texts.ZipperHKRestore);
+            uint quitAtom = GetAtom(Texts.ZipperHKQuit);
 
-            RegisterHotKey(0, saveAtom, GetHotKeys(Strings.Save), Keys.S);
-            RegisterHotKey(0, restoreAtom, GetHotKeys(Strings.Restore), Keys.Z);
-            RegisterHotKey(0, quitAtom, GetHotKeys(Strings.Quit), Keys.Q);
+            RegisterHotKey(0, saveAtom, GetHotKeys(Texts.Save), GetModKey(Texts.Save));
+            RegisterHotKey(0, restoreAtom, GetHotKeys(Texts.Restore), GetModKey(Texts.Restore));
+            RegisterHotKey(0, quitAtom, GetHotKeys(Texts.Quit), GetModKey(Texts.Quit));
 
             //MSG msg;
             while (GetMessageA(out MSG msg, nint.Zero, 0, 0) != 0)
             {
                 if (msg.message != WM_HOTKEY) continue;
-                Console.WriteLine(Strings.HKPressed);
+                Console.WriteLine(Texts.HKPressed);
                 if (msg.wParam == saveAtom)
                 {
                     ZipFolder();

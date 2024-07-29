@@ -17,17 +17,17 @@ namespace SaveBackup.src
 
         public bool HasHotKey(string section, string hotKey)
         {
-            return Read(section, hotKey).Equals(Strings.True, StringComparison.OrdinalIgnoreCase);
+            return Read(section, hotKey).Equals(Texts.True, StringComparison.OrdinalIgnoreCase);
         }
 
-        public string GetModifierKey(string section, string hotKey)
-        {
-            return Read(section, hotKey);
+        public string GetModifierKey(string section)
+        { 
+            return Read(section, "MODIFIER");
         }
 
         public string GetSaveFolder()
         {
-            string folderPath = Read(Strings.SourceFolder, Strings.Path);
+            string folderPath = Read(Texts.SourceFolder, Texts.Path);
             return string.IsNullOrEmpty(folderPath) ?
                 Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) :
                 folderPath;
@@ -39,11 +39,11 @@ namespace SaveBackup.src
             int result = GetPrivateProfileString(section, key, "", SB, 255, FilePath);
             if (result == 0)
             {
-                throw new Exception(Strings.ErrorReadingIni);
+                throw new Exception(Texts.ErrorReadingIni);
             }
             else if (result == 255)
             {
-                throw new Exception(Strings.BufferTooSmall);
+                throw new Exception(Texts.BufferTooSmall);
             }
             return SB.ToString();
         }

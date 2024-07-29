@@ -22,14 +22,14 @@ namespace SaveBackup.src {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Strings {
+    internal class Texts {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Strings() {
+        internal Texts() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace SaveBackup.src {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SaveBackup.src.Strings", typeof(Strings).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SaveBackup.src.Texts", typeof(Texts).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -133,11 +133,29 @@ namespace SaveBackup.src {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Hello!.
+        /// </summary>
+        internal static string Hello {
+            get {
+                return ResourceManager.GetString("Hello", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Hotkey Pressed!.
         /// </summary>
         internal static string HKPressed {
             get {
                 return ResourceManager.GetString("HKPressed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This Modifier key is not supported or you have not chosen a Modifier key!.
+        /// </summary>
+        internal static string InvalidModifier {
+            get {
+                return ResourceManager.GetString("InvalidModifier", resourceCulture);
             }
         }
         
