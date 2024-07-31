@@ -25,10 +25,8 @@ namespace SaveBackup.src
 
 		public uint GetHotKeys(string section)
 		{
-			string iniFilePath = Path.Combine(AppContext.BaseDirectory, Texts.configFile);
-			IniFile iniFile = new(iniFilePath);
 			uint modifier = 0;
-			if (File.Exists(iniFilePath))
+			if (File.Exists(_filePath))
 			{
 				if (HasHotKey(section, Texts.ALT))
 				{
@@ -74,15 +72,10 @@ namespace SaveBackup.src
 
 		private Keys GetModKey(string section)
         {
-            string iniFilePath = Path.Combine(AppContext.BaseDirectory, Texts.configFile);
-            IniFile iniFile = new(iniFilePath);
             string modifier = GetModifierKey(section);
-            if (File.Exists(iniFilePath) && modifier != "")
+            if (File.Exists(_filePath) && modifier != "")
             {
-                if (keyMap.TryGetValue(modifier, out Keys userKey))
-                {
-                    return userKey;
-                }
+                return KeyMap.GetKey(modifier);
             }
             switch (section)
             {
@@ -110,6 +103,20 @@ namespace SaveBackup.src
             return Read(section, hotKey).Equals(Texts.True, StringComparison.OrdinalIgnoreCase);
         }
 
+
+		private string GetModifierKey(string section)
+        { 
+            return Read(section, "MODIFIER");
+        }
+
+        private string GetSaveFolder()
+        {
+            string folderPath = Read(Texts.SourceFolder, Texts.Path);
+            return string.IsNullOrEmpty(folderPath) ?
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) :
+                folderPath;
+        }
+
 		private string Read(string section, string key)
         {
             StringBuilder SB = new(255);
@@ -123,19 +130,6 @@ namespace SaveBackup.src
                 throw new Exception(Texts.BufferTooSmall);
             }
             return SB.ToString();
-        }
-
-		private string GetModifierKey(string section)
-        { 
-            return Read(section, "MODIFIER");
-        }
-
-        private string GetSaveFolder()
-        {
-            string folderPath = Read(Texts.SourceFolder, Texts.Path);
-            return string.IsNullOrEmpty(folderPath) ?
-                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) :
-                folderPath;
         }
 		
 	}
