@@ -259,6 +259,15 @@ namespace SaveBackup.src {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to SaveFolder.
+        /// </summary>
+        internal static string SaveFolder {
+            get {
+                return ResourceManager.GetString("SaveFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Save: CTRL + SHIFT + S.
         /// </summary>
         internal static string SaveHotkey {

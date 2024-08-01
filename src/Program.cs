@@ -5,62 +5,22 @@ namespace SaveBackup.src
 {
     public partial class Zippy
     {
-        [DllImport("kernel32.dll", CharSet = CharSet.Ansi, SetLastError = true)]
-        internal static extern uint GlobalAddAtomA(string lpString);
-
-        [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
-        internal static extern ushort GlobalDeleteAtom(uint nAtom);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern bool RegisterHotKey(nint hWnd, uint keyId, uint fsModifiers, Keys vk);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern bool UnregisterHotKey(nint hWnd, uint id);
-        [DllImport("user32.dll")]
-        static extern int GetMessageA(out MSG lpMsg, nint hWnd, uint wMsgFilterMin, uint wMsgFilterMax);
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct POINT
-        {
-            public int X;
-            public int Y;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct MSG
-        {
-            readonly nint hwnd;
-            public uint message;
-            public nuint wParam;
-            readonly nint lParam;
-            readonly int time;
-            readonly POINT pt;
-            readonly int lPrivate;
-        }
-
-        const uint MOD_ALT = 0x0001;
-        const uint MOD_CONTROL = 0x0002;
-        const uint MOD_SHIFT = 0x0004;
-        const uint WM_HOTKEY = 0x0312;
-
-        private static readonly Dictionary<string, Keys> keyMap = [];
-
         private static void ZipFolder()
         {
             try
             {
-                string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                string zipFolder = Path.Combine(documentsPath, Texts.NBGIBackup);
-                string sourceFolder = Path.Combine(documentsPath, Texts.NBGI);
-                string zipFile = Path.Combine(zipFolder, $"{Texts.NBGI}_{DateTime.Now:yyyyMMddHHmmss}{Texts.dotZip}");
-                if (!Directory.Exists(zipFolder))
+                string saveFolder = ConfigManager.Read("SaveFolder", "Path");
+                string name = ConfigManager.Read("SaveFolder", "Name");
+                string zipPath = ConfigManager.Read("SaveFolder", "ZipPath");
+                string zipFile = Path.Combine(zipPath, $"{name}_{DateTime.Now:yyyyMMddHHmmss}{Texts.dotZip}");
+                if (!Directory.Exists(zipPath))
                 {
-                    Directory.CreateDirectory(zipFolder);
+                    Directory.CreateDirectory(zipPath);
                 }
                 using ZipArchive zip = ZipFile.Open(zipFile, ZipArchiveMode.Create);
-                foreach (string file in Directory.EnumerateFiles(sourceFolder, "*", SearchOption.AllDirectories))
+                foreach (string file in Directory.EnumerateFiles(saveFolder, "*", SearchOption.AllDirectories))
                 {
-                    zip.CreateEntryFromFile(file, Path.GetRelativePath(sourceFolder, file));
+                    zip.CreateEntryFromFile(file, Path.GetRelativePath(saveFolder, file));
                 }
             }
             catch (Exception ex)
@@ -69,65 +29,15 @@ namespace SaveBackup.src
             }
         }
 
-        // private static uint GetHotKeys(string section)
-        // {
-        //     string iniFilePath = Path.Combine(AppContext.BaseDirectory, Texts.configFile);
-        //     IniFile iniFile = new(iniFilePath);
-        //     uint modifier = 0;
-        //     if (File.Exists(iniFilePath))
-        //     {
-        //         if (iniFile.HasHotKey(section, Texts.ALT))
-        //         {
-        //             modifier |= MOD_ALT;
-        //         }
-        //         if (iniFile.HasHotKey(section, Texts.CTRL))
-        //         {
-        //             modifier |= MOD_CONTROL;
-        //         }
-        //         if (iniFile.HasHotKey(section, Texts.SHIFT))
-        //         {
-        //             modifier |= MOD_SHIFT;
-        //         }
-        //         if (modifier == 0)
-        //         {
-        //             Console.WriteLine(Texts.FileFoundNoConfig);
-        //         }
-        //     }
-        //     if (modifier == 0)
-        //     {
-        //         switch (section)
-        //         {
-        //             case "Save":
-        //                 Console.WriteLine(Texts.SaveNotloaded, Texts.SaveHotkey);
-        //                 break;
-        //             case "Restore":
-        //                 Console.WriteLine(Texts.RestoreNotloaded, Texts.RestoreHotkey);
-        //                 break;
-        //             case "Quit":
-        //                 Console.WriteLine(Texts.QuitNotloaded, Texts.QuitHotkey);
-        //                 break;
-        //             default:
-        //                 Console.WriteLine(Texts.SomethingWrongDefaultHotKey);
-        //                 Console.WriteLine(Texts.SaveHotkey);
-        //                 Console.WriteLine(Texts.RestoreHotkey);
-        //                 Console.WriteLine(Texts.QuitHotkey);
-        //                 break;
-        //         }
-        //         modifier = MOD_CONTROL | MOD_SHIFT;
-        //     }
-        //     return modifier;
-        // }
-
         private static void RestoreFolder()
         {
             try
             {
-                string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                string zipFolder = Path.Combine(documentsPath, Texts.NBGIBackup);
-                string sourceFolder = Path.Combine(documentsPath, Texts.NBGI);
-
+                string saveFolder = ConfigManager.Read("SaveFolder", "Path");
+                string zipPath = ConfigManager.Read("SaveFolder", "ZipPath");
                 string zipFile = "";
-                foreach (string file in Directory.EnumerateFiles(zipFolder))
+
+                foreach (string file in Directory.EnumerateFiles(zipPath))
                 {
                     if (!file.EndsWith(Texts.dotZip))
                     {
@@ -153,7 +63,7 @@ namespace SaveBackup.src
                 }
                 Console.WriteLine($"{Texts.RestoreFrom} {zipFile}");
                 ZipArchive zip = ZipFile.OpenRead(zipFile);
-                ZipFile.ExtractToDirectory(zipFile, sourceFolder, true);
+                ZipFile.ExtractToDirectory(zipFile, saveFolder, true);
             }
             catch (Exception ex)
             {
@@ -161,56 +71,16 @@ namespace SaveBackup.src
             }
         }
 
-        private static uint GetAtom(string atomName)
-        {
-            return GlobalAddAtomA(atomName);
-        }
-
-        // private static Keys GetModKey(string section)
-        // {
-        //     string iniFilePath = Path.Combine(AppContext.BaseDirectory, Texts.configFile);
-        //     IniFile iniFile = new(iniFilePath);
-        //     string modifier = GetModifierKey(section);
-        //     if (File.Exists(iniFilePath) && modifier != "")
-        //     {
-        //         if (keyMap.TryGetValue(modifier, out Keys userKey))
-        //         {
-        //             return userKey;
-        //         }
-        //     }
-        //     switch (section)
-        //     {
-        //         case "Save":
-        //             Console.WriteLine(Texts.SaveNotloaded, Texts.SaveHotkey);
-        //             return Keys.S;
-        //         case "Restore":
-        //             Console.WriteLine(Texts.RestoreNotloaded, Texts.RestoreHotkey);
-        //             return Keys.Z;
-        //         case "Quit":
-        //             Console.WriteLine(Texts.QuitNotloaded, Texts.QuitHotkey);
-        //             return Keys.Q;
-        //         default:
-        //             Console.WriteLine(Texts.SomethingWrongDefaultHotKey);
-        //             Console.WriteLine(Texts.SaveHotkey);
-        //             Console.WriteLine(Texts.RestoreHotkey);
-        //             Console.WriteLine(Texts.QuitHotkey);
-        //             break;
-        //     }
-        //     return Keys.None;
-        // }
-
         public static void Main()
         {
-            InitKeyMap();
-            uint saveAtom = GetAtom(Texts.ZipperHKSave);
-            uint restoreAtom = GetAtom(Texts.ZipperHKRestore);
-            uint quitAtom = GetAtom(Texts.ZipperHKQuit);
+            uint saveAtom = GlobalAddAtomA(Texts.ZipperHKSave);
+            uint restoreAtom = GlobalAddAtomA(Texts.ZipperHKRestore);
+            uint quitAtom = GlobalAddAtomA(Texts.ZipperHKQuit);
 
-            RegisterHotKey(0, saveAtom, GetHotKeys(Texts.Save), GetModKey(Texts.Save));
-            RegisterHotKey(0, restoreAtom, GetHotKeys(Texts.Restore), GetModKey(Texts.Restore));
-            RegisterHotKey(0, quitAtom, GetHotKeys(Texts.Quit), GetModKey(Texts.Quit));
+            RegisterHotKey(0, saveAtom, ConfigManager.GetHotKeys(Texts.Save), ConfigManager.GetModKey(Texts.Save));
+            RegisterHotKey(0, restoreAtom, ConfigManager.GetHotKeys(Texts.Restore), ConfigManager.GetModKey(Texts.Restore));
+            RegisterHotKey(0, quitAtom, ConfigManager.GetHotKeys(Texts.Quit), ConfigManager.GetModKey(Texts.Quit));
 
-            //MSG msg;
             while (GetMessageA(out MSG msg, nint.Zero, 0, 0) != 0)
             {
                 if (msg.message != WM_HOTKEY) continue;

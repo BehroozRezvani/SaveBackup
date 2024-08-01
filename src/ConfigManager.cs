@@ -4,12 +4,9 @@ using System.Text;
 
 namespace SaveBackup.src
 {
-	public class ConfigManager
+	public static class ConfigManager
 	{
-		private readonly string _filePath = Path.Combine(AppContext.BaseDirectory, Texts.configFile);
-		public ConfigManager()
-		{
-		}
+		private readonly static string _filePath = Path.Combine(AppContext.BaseDirectory, Texts.configFile);
 
 		[DllImport("kernel32")]
         private static extern int GetPrivateProfileString(string section,
@@ -23,7 +20,7 @@ namespace SaveBackup.src
 		const uint MOD_CONTROL = 0x0002;
 		const uint MOD_SHIFT = 0x0004;
 
-		public uint GetHotKeys(string section)
+		public static uint GetHotKeys(string section)
 		{
 			uint modifier = 0;
 			if (File.Exists(_filePath))
@@ -70,7 +67,7 @@ namespace SaveBackup.src
 			return modifier;
 		}
 
-		private Keys GetModKey(string section)
+		public static Keys GetModKey(string section)
         {
             string modifier = GetModifierKey(section);
             if (File.Exists(_filePath) && modifier != "")
@@ -98,26 +95,18 @@ namespace SaveBackup.src
             return Keys.None;
         }
 
-		private bool HasHotKey(string section, string hotKey)
+		private static bool HasHotKey(string section, string hotKey)
         {
             return Read(section, hotKey).Equals(Texts.True, StringComparison.OrdinalIgnoreCase);
         }
 
 
-		private string GetModifierKey(string section)
+		private static string GetModifierKey(string section)
         { 
             return Read(section, "MODIFIER");
         }
 
-        private string GetSaveFolder()
-        {
-            string folderPath = Read(Texts.SourceFolder, Texts.Path);
-            return string.IsNullOrEmpty(folderPath) ?
-                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) :
-                folderPath;
-        }
-
-		private string Read(string section, string key)
+		public static string Read(string section, string key)
         {
             StringBuilder SB = new(255);
             int result = GetPrivateProfileString(section, key, "", SB, 255, _filePath);

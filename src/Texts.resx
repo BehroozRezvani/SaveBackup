@@ -183,6 +183,9 @@
   <data name="Save" xml:space="preserve">
     <value>Save</value>
   </data>
+  <data name="SaveFolder" xml:space="preserve">
+    <value>SaveFolder</value>
+  </data>
   <data name="SaveHotkey" xml:space="preserve">
     <value>Save: CTRL + SHIFT + S</value>
   </data>
