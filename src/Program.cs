@@ -12,7 +12,7 @@ namespace SaveBackup.src
                 string saveFolder = ConfigManager.Read("SaveFolder", "Path");
                 string name = ConfigManager.Read("SaveFolder", "Name");
                 string zipPath = ConfigManager.Read("SaveFolder", "ZipPath");
-                string zipFile = Path.Combine(zipPath, $"{name}_{DateTime.Now:yyyyMMddHHmmss}{Texts.dotZip}");
+                string zipFile = Path.Combine(zipPath, $"{name}_{DateTime.Now:yyyyMMddHHmmss}{".zip"}");
                 if (!Directory.Exists(zipPath))
                 {
                     Directory.CreateDirectory(zipPath);
@@ -39,7 +39,7 @@ namespace SaveBackup.src
 
                 foreach (string file in Directory.EnumerateFiles(zipPath))
                 {
-                    if (!file.EndsWith(Texts.dotZip))
+                    if (!file.EndsWith(".zip"))
                     {
                         continue;
                     }
@@ -54,14 +54,16 @@ namespace SaveBackup.src
                 }
                 if (zipFile == "")
                 {
-                    Console.WriteLine(Texts.FileNotFound);
-                    //NotifyIcon notifyIcon = new NotifyIcon();
-                    //notifyIcon.Icon = System.Drawing.SystemIcons.Warning;
-                    //notifyIcon.Visible = true;
+                    Console.WriteLine("No backup file found.");
+                    //NotifyIcon notifyIcon = new()
+                    //{
+                    //    Icon = System.Drawing.SystemIcons.Warning,
+                    //    Visible = true
+                    //};
                     //notifyIcon.ShowBalloonTip(5000, "Completed", "This is a toast notification", ToolTipIcon.None);
                     return;
                 }
-                Console.WriteLine($"{Texts.RestoreFrom} {zipFile}");
+                Console.WriteLine($"{"Restoring from"} {zipFile}");
                 ZipArchive zip = ZipFile.OpenRead(zipFile);
                 ZipFile.ExtractToDirectory(zipFile, saveFolder, true);
             }
@@ -73,18 +75,19 @@ namespace SaveBackup.src
 
         public static void Main()
         {
-            uint saveAtom = GlobalAddAtomA(Texts.ZipperHKSave);
-            uint restoreAtom = GlobalAddAtomA(Texts.ZipperHKRestore);
-            uint quitAtom = GlobalAddAtomA(Texts.ZipperHKQuit);
+            uint saveAtom = GlobalAddAtomA("ZipperHotKeySave");
+            uint restoreAtom = GlobalAddAtomA("ZipperHotKeyRestore");
+            uint quitAtom = GlobalAddAtomA("ZipperHotKeyQuit");
 
-            RegisterHotKey(0, saveAtom, ConfigManager.GetHotKeys(Texts.Save), ConfigManager.GetModKey(Texts.Save));
-            RegisterHotKey(0, restoreAtom, ConfigManager.GetHotKeys(Texts.Restore), ConfigManager.GetModKey(Texts.Restore));
-            RegisterHotKey(0, quitAtom, ConfigManager.GetHotKeys(Texts.Quit), ConfigManager.GetModKey(Texts.Quit));
+            RegisterHotKey(0, saveAtom, ConfigManager.GetHotKeys("Save"), ConfigManager.GetModKey("Save"));
+            RegisterHotKey(0, restoreAtom, ConfigManager.GetHotKeys("Restore"), ConfigManager.GetModKey("Restore"));
+            RegisterHotKey(0, quitAtom, ConfigManager.GetHotKeys("Quit"), ConfigManager.GetModKey("Quit"));
 
+            Console.WriteLine("Ready!");
             while (GetMessageA(out MSG msg, nint.Zero, 0, 0) != 0)
             {
                 if (msg.message != WM_HOTKEY) continue;
-                Console.WriteLine(Texts.HKPressed);
+                Console.WriteLine("Hotkey Pressed!");
                 if (msg.wParam == saveAtom)
                 {
                     ZipFolder();
