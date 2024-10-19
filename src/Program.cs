@@ -1,12 +1,14 @@
 ﻿using System.IO.Compression;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace SaveBackup.src
 {
+    [SupportedOSPlatform("Windows6.1")]
     public partial class Zippy
     {
         [DllImport("kernel32.dll", CharSet = CharSet.Ansi, SetLastError = true)]
-        internal static extern uint GlobalAddAtomA([MarshalAs(UnmanagedType.LPWStr)] string lpString);
+        internal static extern uint GlobalAddAtomA(string lpString);
 
         [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
         internal static extern ushort GlobalDeleteAtom(uint nAtom);
@@ -71,7 +73,7 @@ namespace SaveBackup.src
                 }
                 else
                 {
-                    Console.WriteLine($"Backup created! File: {zipFile} at directory: {zipPath}");
+                    Console.WriteLine($"Backup created! File: {zipFile}");
                 }
             }
             catch (Exception ex)
@@ -124,7 +126,7 @@ namespace SaveBackup.src
                 }
                 else
                 {
-                    Console.WriteLine($"Backup Restored! using File: {zipFile} at directory: {zipPath}");
+                    Console.WriteLine($"Backup Restored! using File: {zipFile}");
                 }
             }
             catch (Exception ex)

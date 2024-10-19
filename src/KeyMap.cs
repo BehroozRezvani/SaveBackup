@@ -1,7 +1,11 @@
+using System.Runtime.Versioning;
+
 namespace SaveBackup.src
 {
+    [SupportedOSPlatform("Windows6.1")]
     public static class KeyMap
     {
+
         private static readonly ILookup<string, Keys> keyMap;
 
         static KeyMap()

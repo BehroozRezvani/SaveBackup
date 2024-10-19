@@ -1,8 +1,10 @@
 ﻿using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Text;
 
 namespace SaveBackup.src
 {
+    [SupportedOSPlatform("Windows6.1")]
     public static class ConfigManager
     {
         private readonly static string _filePath = Path.Combine(AppContext.BaseDirectory, "config.ini");
