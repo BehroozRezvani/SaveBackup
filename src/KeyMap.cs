@@ -12,10 +12,10 @@ namespace SaveBackup.src
             {
                 dictionary[c.ToString()] = (Keys)Enum.Parse(typeof(Keys), c.ToString());
             }
-            for (int i = 0; i <= 9; i++)
-            {
-                dictionary[i.ToString()] = (Keys)Enum.Parse(typeof(Keys), "D" + i);
-            }
+            //for (int i = 0; i <= 9; i++)
+            //{
+            //    dictionary[i.ToString()] = (Keys)Enum.Parse(typeof(Keys), "D" + i);
+            //}
             for (int i = 1; i <= 12; i++)
             {
                 dictionary["F" + i] = (Keys)Enum.Parse(typeof(Keys), "F" + i);

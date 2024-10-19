@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Text;
 
 namespace SaveBackup.src
@@ -16,25 +15,35 @@ namespace SaveBackup.src
         int size,
         string filePath);
 
+        [DllImport("kernel32", CharSet = CharSet.Unicode)]
+        private static extern int WritePrivateProfileString(string section,
+        string key,
+        string val,
+        string filePath);
+
         private const uint MOD_ALT = 0x0001;
         private const uint MOD_CONTROL = 0x0002;
         private const uint MOD_SHIFT = 0x0004;
 
         public static uint GetHotKeys(string section)
         {
+            string hotKeyText = string.Empty;
             uint modifier = 0;
             if (File.Exists(_filePath))
             {
                 if (HasHotKey(section, "ALT"))
                 {
+                    hotKeyText = "ALT + ";
                     modifier |= MOD_ALT;
                 }
                 if (HasHotKey(section, "CTRL"))
                 {
+                    hotKeyText += "CTRL + ";
                     modifier |= MOD_CONTROL;
                 }
                 if (HasHotKey(section, "SHIFT"))
                 {
+                    hotKeyText += "SHIFT + ";
                     modifier |= MOD_SHIFT;
                 }
                 if (modifier == 0)
@@ -64,12 +73,14 @@ namespace SaveBackup.src
                 }
                 modifier = MOD_CONTROL | MOD_SHIFT;
             }
+            Console.Write(hotKeyText);
             return modifier;
         }
 
         public static Keys GetModKey(string section)
         {
-            string modifier = GetModifierKey(section);
+            string modifier = GetModifierKey(section).ToUpper();
+            Console.WriteLine(modifier);
             if (File.Exists(_filePath) && modifier != "")
             {
                 return KeyMap.GetKey(modifier);
@@ -112,7 +123,8 @@ namespace SaveBackup.src
             int result = GetPrivateProfileString(section, key, "", SB, 255, _filePath);
             if (result == 0)
             {
-                throw new Exception("Error reading INI file.");
+                Console.WriteLine($"Error reading INI file or no value for Section: {section}, Key: {key}");
+                return string.Empty;
             }
             else if (result == 255)
             {
@@ -120,6 +132,9 @@ namespace SaveBackup.src
             }
             return SB.ToString();
         }
-
+        public static bool Write(string section, string key, string val)
+        {
+            return WritePrivateProfileString(section, key, val, _filePath) != 0;
+        }
     }
 }
