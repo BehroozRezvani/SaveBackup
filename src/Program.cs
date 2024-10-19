@@ -42,15 +42,41 @@ namespace SaveBackup.src
         }
 
         const uint WM_HOTKEY = 0x0312;
+        
+        private static void SetupINIFile()
+        {
+            if (!File.Exists("config.ini"))
+            {
+                ConfigManager.Write("Save", "ALT", "false");
+                ConfigManager.Write("Save", "CTRL", "true");
+                ConfigManager.Write("Save", "SHIFT", "true");
+                ConfigManager.Write("Save", "MODIFIER", "S");
 
+                ConfigManager.Write("Restore", "ALT", "false");
+                ConfigManager.Write("Restore", "CTRL", "true");
+                ConfigManager.Write("Restore", "SHIFT", "true");
+                ConfigManager.Write("Restore", "MODIFIER", "Z");
+
+                ConfigManager.Write("Quit", "ALT", "false");
+                ConfigManager.Write("Quit", "CTRL", "true");
+                ConfigManager.Write("Quit", "SHIFT", "true");
+                ConfigManager.Write("Quit", "MODIFIER", "Q");
+
+                ConfigManager.Write("Game", "Name", "Dark_Souls_Remastered");
+                ConfigManager.Write("Game", "SavePath", Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "NBGI"));
+                ConfigManager.Write("Game", "ZipPath", Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "NBGI_Backup"));
+
+                ConfigManager.Write("ToastNotification", "Enabled", "");
+            }
+        }
 
         private static void ZipFolder(bool toastNotify)
         {
             try
             {
-                string saveFolder = ConfigManager.Read("SaveFolder", "SavePath");
-                string name = ConfigManager.Read("SaveFolder", "Name");
-                string zipPath = ConfigManager.Read("SaveFolder", "ZipPath");
+                string name = ConfigManager.Read("Game", "Name");
+                string saveFolder = ConfigManager.Read("Game", "SavePath");
+                string zipPath = ConfigManager.Read("Game", "ZipPath");
                 string zipFile = Path.Combine(zipPath, $"{name}_{DateTime.Now:yyyyMMddHHmmss}{".zip"}");
                 if (!Directory.Exists(zipPath))
                 {
@@ -86,8 +112,8 @@ namespace SaveBackup.src
         {
             try
             {
-                string saveFolder = ConfigManager.Read("SaveFolder", "SavePath");
-                string zipPath = ConfigManager.Read("SaveFolder", "ZipPath");
+                string saveFolder = ConfigManager.Read("Game", "SavePath");
+                string zipPath = ConfigManager.Read("Game", "ZipPath");
                 string zipFile = "";
 
                 foreach (string file in Directory.EnumerateFiles(zipPath))
@@ -137,12 +163,18 @@ namespace SaveBackup.src
 
         public static void Main()
         {
+            SetupINIFile();
+
+            string NORMAL = Console.IsOutputRedirected ? "" : "\x1b[39m";
+            string RED = Console.IsOutputRedirected ? "" : "\x1b[91m";
+            string GREEN = Console.IsOutputRedirected ? "" : "\x1b[92m";
+
             bool toast;
             string toastNotification = ConfigManager.Read("ToastNotification", "Enabled");
             toast = toastNotification.Equals("true", StringComparison.OrdinalIgnoreCase);
             if(string.IsNullOrEmpty(toastNotification))
             {
-                Console.WriteLine("Would you like Toast Notifications? Yes: y, No: n ");
+                Console.WriteLine($"Would you like Toast Notifications? {GREEN}Y / y{NORMAL} for Yes, {RED}N / n{NORMAL} for No");
                 string? input = Console.ReadLine();
                 toast = input != null && input.Equals("y", StringComparison.CurrentCultureIgnoreCase);
                 Console.WriteLine("This will be saved for future, you can edit this by modifying config.ini file.\n");
@@ -161,7 +193,7 @@ namespace SaveBackup.src
             RegisterHotKey(0, quitAtom, ConfigManager.GetHotKeys("Quit"), ConfigManager.GetModKey("Quit"));
 
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
-            Console.WriteLine("\nReady!");
+            Console.WriteLine($"\n{GREEN}Ready!{NORMAL}");
             while (GetMessageA(out MSG msg, nint.Zero, 0, 0) != 0)
             {
                 if (msg.message != WM_HOTKEY) continue;
